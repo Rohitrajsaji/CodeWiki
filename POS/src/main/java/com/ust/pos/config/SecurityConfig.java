@@ -1,0 +1,27 @@
+package com.ust.pos.config;
+
+import jakarta.servlet.DispatcherType;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+//@Configuration
+//@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) {
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().requestMatchers("/login", "/register", "/api/**").permitAll().anyRequest().authenticated())
+                .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
+                .logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
+        return http.build();
+    }
+}
